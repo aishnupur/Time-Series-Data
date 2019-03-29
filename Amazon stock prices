@@ -1,0 +1,35 @@
+#Import the libraries
+library(ggplot2)
+library(scales)
+library(readr)
+library(tidyverse)
+library(forecast)
+
+#Import the data
+my_data <- read_csv("C:/Users/nupur/Downloads/AMZNtrain.csv")
+View(my_data)
+
+#Plot the data using ggplot2
+ggplot(my_data, aes(x = my_data$Date, y = my_data$Volume)) + geom_line() + labs(x = "Date", y = "Volume", title="Amazon Stock Prices from 2014 to 2019")
+
+#Use the Autoregressive Integrated Moving Average model
+arimaAP <- auto.arima(my_data$'Adj Close')
+arimaAP
+
+#finding trends in data
+trend_stock = ma(my_data, order = 12, centre = T)
+plot(as.ts(my_data))
+plot(as.ts(trend_stock))
+
+#detrending the time series
+#multiplicative
+detrend_stock <- (as.ts(my_data) / trend_stock)
+plot(as.ts(detrend_stock))
+
+#additive
+detrend_add_stock <- (as.ts(my_data) - trend_stock)
+plot(as.ts(detrend_add_stock))
+
+#Use empirical autocorrelation function 
+acf(detrend_stock)
+pacf(my_data$Open)
